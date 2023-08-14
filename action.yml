@@ -11,16 +11,21 @@ inputs:
     description: 'Record name of resource'
   recordType:
     required: true
-    description: 'Record type of resource. A, CNAME, TXT...'
+    description: 'Record type of resource - (A, CNAME, TXT...)'
     default: 'A'
+  useAlias:
+    required: true
+    description: 'Use alias to choise AWS endpoints - (API GTW, ALB, NLB...)'
+    default: 'true'
   resourceValue:
     required: true
-    description: 'Resource value. ALB, Domain, IP...'
+    description: 'Record target - (Domain, IP or alias)'
+    
 
 runs:
   using: 'node16'
   main: 'dist/index.js'
 
 branding:
-  icon: 'activity'
+  icon: 'upload-cloud'
   color: 'gray-dark'
