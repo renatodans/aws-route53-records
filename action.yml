@@ -1,0 +1,26 @@
+name: 'aws-route53-records'
+description: 'GitHub Action for AWS Route53 Records Sets'
+author: renatodans
+
+inputs:
+  hostedZoneId:
+    required: true
+    description: 'Route 53 Hosted Zone Id'  
+  recordName:
+    required: true
+    description: 'Record name of resource'
+  recordType:
+    required: true
+    description: 'Record type of resource. A, CNAME, TXT...'
+    default: 'A'
+  resourceValue:
+    required: true
+    description: 'Resource value. ALB, Domain, IP...'
+
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
+
+branding:
+  icon: 'activity'
+  color: 'gray-dark'
