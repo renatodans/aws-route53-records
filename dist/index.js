@@ -33969,39 +33969,42 @@ exports.run = void 0;
 const core_1 = __nccwpck_require__(42186);
 const client_route_53_1 = __nccwpck_require__(73113);
 async function run() {
-    var _a;
+    var _a, _b;
     try {
         const hostedZoneId = (0, core_1.getInput)("hostedZoneId");
         const recordName = (0, core_1.getInput)("recordName");
         const recordType = (0, core_1.getInput)("recordType");
+        const useAlias = (0, core_1.getBooleanInput)("useAlias");
         const resourceValue = (0, core_1.getInput)("resourceValue");
-        const client = new client_route_53_1.Route53Client({});
         const filter = {
             HostedZoneId: hostedZoneId,
-            StartRecordName: recordName,
+            StartRecordName: (recordName.charAt(recordName.length - 1) == ".") ? recordName : recordName + ".",
             StartRecordType: recordType,
             MaxItems: 1,
         };
+        const client = new client_route_53_1.Route53Client({});
         const listCommand = new client_route_53_1.ListResourceRecordSetsCommand(filter);
         const listResponse = await client.send(listCommand);
-        if (listResponse == null) {
+        if (((_a = listResponse === null || listResponse === void 0 ? void 0 : listResponse.ResourceRecordSets) === null || _a === void 0 ? void 0 : _a.length) == 0) {
+            var resourceRecordSet = {};
+            resourceRecordSet.Name = recordName;
+            resourceRecordSet.Type = recordType;
+            if (useAlias) {
+                var aliasTarget = JSON.parse(resourceValue);
+                resourceRecordSet.AliasTarget = aliasTarget;
+            }
+            else {
+                resourceRecordSet.ResourceRecords = [{
+                        Value: resourceValue
+                    }];
+            }
+            var change = {};
+            change.Action = "CREATE";
+            change.ResourceRecordSet = resourceRecordSet;
             var input = {};
             input.HostedZoneId = hostedZoneId;
             input.ChangeBatch = {
-                Changes: [
-                    {
-                        Action: "CREATE",
-                        ResourceRecordSet: {
-                            Name: recordName,
-                            Type: recordType,
-                            ResourceRecords: [
-                                {
-                                    Value: resourceValue
-                                }
-                            ]
-                        }
-                    }
-                ]
+                Changes: [change]
             };
             const changeCommand = new client_route_53_1.ChangeResourceRecordSetsCommand(input);
             await client.send(changeCommand);
@@ -34012,7 +34015,7 @@ async function run() {
         }
     }
     catch (error) {
-        (0, core_1.setFailed)((_a = error === null || error === void 0 ? void 0 : error.message) !== null && _a !== void 0 ? _a : "Unknown error");
+        (0, core_1.setFailed)((_b = error === null || error === void 0 ? void 0 : error.message) !== null && _b !== void 0 ? _b : "Unknown error");
     }
 }
 exports.run = run;
